@@ -10,21 +10,19 @@ function Toast({ message, type = "info", onClose }) {
   return (
     <div
       className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3
-        ${type === "success"
-          ? "bg-gradient-to-r from-green-400 to-green-600 text-white"
-          : "bg-gradient-to-r from-red-400 to-pink-500 text-white"}
+        ${
+          type === "success"
+            ? "bg-gradient-to-r from-green-400 to-green-600 text-white"
+            : "bg-gradient-to-r from-red-400 to-pink-500 text-white"
+        }
         animate-fade-in`}
-      style={{ minWidth: 280 }}
-    >
-      <span className="text-2xl">
-        {type === "success" ? "✅" : "⚠️"}
-      </span>
+      style={{ minWidth: 280 }}>
+      <span className="text-2xl">{type === "success" ? "✅" : "⚠️"}</span>
       <span className="font-semibold">{message}</span>
       <button
         onClick={onClose}
         className="ml-4 text-white/80 hover:text-white text-lg font-bold"
-        aria-label="Tutup"
-      >
+        aria-label="Tutup">
         ×
       </button>
     </div>
@@ -43,12 +41,19 @@ export default function RegisterPage() {
     reason: "",
   });
 
-  // State untuk toast
-  const [toast, setToast] = useState({ show: false, message: "", type: "info" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "info",
+  });
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const showToast = (message, type = "info") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "info" }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "info" }),
+      3000
+    );
   };
 
   const handleChange = (e) => {
@@ -56,8 +61,15 @@ export default function RegisterPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  // Tampilkan modal konfirmasi saat tombol submit diklik
+  const handleShowConfirm = (e) => {
     e.preventDefault();
+    setShowConfirm(true);
+  };
+
+  // Proses submit setelah klik "Iya" di modal
+  const handleConfirmSubmit = () => {
+    // Validasi
     if (
       !form.name ||
       !form.email ||
@@ -69,9 +81,9 @@ export default function RegisterPage() {
         "Oops! Sepertinya ada beberapa informasi yang belum lengkap. Mohon lengkapi semua field yang diperlukan ya.",
         "error"
       );
+      setShowConfirm(false);
       return;
     }
-
     addParticipant(form);
     showToast(
       "Selamat! Pendaftaran Anda berhasil. Kami sangat antusias menyambut Anda!",
@@ -85,7 +97,8 @@ export default function RegisterPage() {
       session: "",
       reason: "",
     });
-    setTimeout(() => router.push("/"), 1200); // Redirect setelah toast tampil sebentar
+    setShowConfirm(false);
+    setTimeout(() => router.push("/"), 1200);
   };
 
   return (
@@ -97,6 +110,49 @@ export default function RegisterPage() {
           onClose={() => setToast({ show: false, message: "", type: "info" })}
         />
       )}
+
+      {/* Modal Konfirmasi */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full text-center border border-indigo-100">
+            <div className="mb-4">
+              <div className="mx-auto mb-2 w-12 h-12 flex items-center justify-center rounded-full bg-indigo-100">
+                <svg
+                  className="w-7 h-7 text-indigo-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 8v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"
+                  />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-1">
+                Konfirmasi Pendaftaran
+              </h4>
+              <p className="text-gray-500 text-sm">
+                Apakah Anda yakin ingin mendaftar dengan data yang sudah diisi?
+              </p>
+            </div>
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold shadow hover:bg-gray-300 transition-all duration-150">
+                Batal
+              </button>
+              <button
+                onClick={handleConfirmSubmit}
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-pink-500 text-white font-semibold shadow hover:from-indigo-600 hover:to-pink-600 transition-all duration-150">
+                Iya
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-2xl bg-white/80 backdrop-blur-lg p-10 rounded-3xl shadow-xl border border-indigo-100 transition-all duration-300">
         <h2 className="text-4xl font-extrabold text-indigo-800 mb-3 text-center tracking-tight drop-shadow-md">
           Daftar Sekarang untuk Workshop!
@@ -105,7 +161,7 @@ export default function RegisterPage() {
           Isi formulir singkat di bawah ini dan amankan tempat Anda di workshop
           kami.
         </p>
-        <form onSubmit={handleSubmit} className="space-y-6 text-gray-800">
+        <form onSubmit={handleShowConfirm} className="space-y-6 text-gray-800">
           <InputField
             label="Nama Lengkap"
             name="name"

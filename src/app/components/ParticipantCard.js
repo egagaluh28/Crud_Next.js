@@ -8,6 +8,7 @@ export default function ParticipantCard({ participant }) {
   const { removeParticipant, editParticipant } = useContext(EventContext);
   const [isEdit, setIsEdit] = useState(false);
   const [editForm, setEditForm] = useState({ ...participant });
+  const [showConfirm, setShowConfirm] = useState(false); // State untuk modal konfirmasi
 
   // Handle perubahan pada input form edit
   const handleEditChange = (e) => {
@@ -51,7 +52,7 @@ export default function ParticipantCard({ participant }) {
           </svg>
         </button>
         <button
-          onClick={() => removeParticipant(participant.id)} // Menggunakan participant.id untuk menghapus
+          onClick={() => setShowConfirm(true)}
           className="p-2 rounded-full bg-red-500 text-white shadow-md hover:bg-red-600 transition-colors duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2"
           aria-label="Remove participant"
           title="Remove Participant">
@@ -71,6 +72,52 @@ export default function ParticipantCard({ participant }) {
           </svg>
         </button>
       </div>
+
+      {/* Modal Konfirmasi Hapus */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full text-center border border-indigo-100">
+            <div className="mb-4">
+              <div className="mx-auto mb-2 w-12 h-12 flex items-center justify-center rounded-full bg-red-100">
+                <svg
+                  className="w-7 h-7 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-1">
+                Hapus Peserta?
+              </h4>
+              <p className="text-gray-500 text-sm">
+                Apakah Anda yakin ingin menghapus peserta{" "}
+                <span className="font-semibold">{participant.name}</span>?
+              </p>
+            </div>
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={() => {
+                  removeParticipant(participant.id);
+                  setShowConfirm(false);
+                }}
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold shadow hover:from-red-600 hover:to-pink-600 transition-all duration-150">
+                Iya
+              </button>
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold shadow hover:bg-gray-300 transition-all duration-150">
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tampilan normal informasi peserta */}
       {!isEdit ? (
