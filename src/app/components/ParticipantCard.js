@@ -2,7 +2,11 @@
 "use client"; // Penting karena menggunakan useState dan useContext
 
 import { useContext, useState } from "react";
-import EventContext from "../context/EventContext"; // Pastikan path benar
+import EventContext from "../context/EventContext";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import ParticipantBadges from "./ParticipantBadges";
+import ParticipantReason from "./ParticipantReason";
+import ParticipantEditForm from "./ParticipantEditForm";
 
 export default function ParticipantCard({ participant }) {
   const { removeParticipant, editParticipant } = useContext(EventContext);
@@ -74,52 +78,17 @@ export default function ParticipantCard({ participant }) {
       </div>
 
       {/* Modal Konfirmasi Hapus */}
-      {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full text-center border border-indigo-100">
-            <div className="mb-4">
-              <div className="mx-auto mb-2 w-12 h-12 flex items-center justify-center rounded-full bg-red-100">
-                <svg
-                  className="w-7 h-7 text-red-500"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <h4 className="text-lg font-bold text-gray-800 mb-1">
-                Hapus Peserta?
-              </h4>
-              <p className="text-gray-500 text-sm">
-                Apakah Anda yakin ingin menghapus peserta{" "}
-                <span className="font-semibold">{participant.name}</span>?
-              </p>
-            </div>
-            <div className="flex justify-center gap-4 mt-6">
-              <button
-                onClick={() => {
-                  removeParticipant(participant.id);
-                  setShowConfirm(false);
-                }}
-                className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold shadow hover:from-red-600 hover:to-pink-600 transition-all duration-150">
-                Iya
-              </button>
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold shadow hover:bg-gray-300 transition-all duration-150">
-                Batal
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        show={showConfirm}
+        name={participant.name}
+        onConfirm={() => {
+          removeParticipant(participant.id);
+          setShowConfirm(false);
+        }}
+        onCancel={() => setShowConfirm(false)}
+      />
 
-      {/* Tampilan normal informasi peserta */}
+      {/* Tampilan normal informasi peserta atau form edit */}
       {!isEdit ? (
         <>
           <div className="flex-grow">
@@ -134,131 +103,20 @@ export default function ParticipantCard({ participant }) {
               <span className="font-semibold text-gray-500 mr-2">Telepon:</span>{" "}
               {participant.phone}
             </p>
-
-            {/* Badges untuk Sesi dan Kota */}
-            <div className="flex items-center flex-wrap gap-3 mt-3">
-              <span className="inline-flex items-center px-4 py-1.5 text-sm font-semibold text-indigo-800 bg-gradient-to-r from-indigo-100 to-white rounded-full shadow-sm">
-                {/* Ikon Jam untuk Sesi */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-4 h-4 mr-2">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-                {participant.session}
-              </span>
-              <span className="inline-flex items-center px-4 py-1.5 text-sm font-semibold text-purple-800 bg-gradient-to-r from-purple-100 to-white rounded-full shadow-sm">
-                {/* Ikon Lokasi untuk Kota */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-4 h-4 mr-2">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 8.25V18a2.25 2.25 0 0 0 2.25 2.25h13.5A2.25 2.25 0 0 0 21 18V8.25m-18 0V6a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 6v2.25m-18 0h18M5.25 6H18"
-                  />
-                </svg>
-                {participant.city}
-              </span>
-            </div>
-
-            {/* Bagian alasan bergabung, dengan styling kutipan */}
-            {participant.reason && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-600 italic leading-relaxed">
-                  <span className="text-indigo-400 text-lg font-bold mr-1">
-                    &ldquo;
-                  </span>
-                  {participant.reason}
-                  <span className="text-indigo-400 text-lg font-bold ml-1">
-                    &rdquo;
-                  </span>
-                </p>
-              </div>
-            )}
+            <ParticipantBadges
+              session={participant.session}
+              city={participant.city}
+            />
+            <ParticipantReason reason={participant.reason} />
           </div>
         </>
       ) : (
-        // Form edit peserta
-        <form onSubmit={handleEditSubmit} className="flex flex-col gap-4 mt-1">
-          <input
-            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200 text-gray-800 placeholder-gray-400 text-base"
-            name="name"
-            value={editForm.name}
-            onChange={handleEditChange}
-            placeholder="Nama Lengkap"
-            required
-          />
-          <input
-            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200 text-gray-800 placeholder-gray-400 text-base"
-            name="email"
-            type="email"
-            value={editForm.email}
-            onChange={handleEditChange}
-            placeholder="Email"
-            required
-          />
-          <input
-            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200 text-gray-800 placeholder-gray-400 text-base"
-            name="phone"
-            type="tel"
-            value={editForm.phone}
-            onChange={handleEditChange}
-            placeholder="Nomor Telepon"
-            required
-          />
-          <input
-            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200 text-gray-800 placeholder-gray-400 text-base"
-            name="city"
-            value={editForm.city}
-            onChange={handleEditChange}
-            placeholder="Kota Asal"
-            required
-          />
-          <select
-            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200 text-gray-800 bg-white placeholder-gray-400 text-base"
-            name="session"
-            value={editForm.session}
-            onChange={handleEditChange}>
-            <option value="" disabled>
-              Pilih Sesi Workshop
-            </option>
-            <option value="Pagi">Sesi Pagi</option>
-            <option value="Siang">Sesi Siang</option>
-          </select>
-          <textarea
-            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200 text-gray-800 placeholder-gray-400 resize-y"
-            name="reason"
-            value={editForm.reason}
-            onChange={handleEditChange}
-            placeholder="Alasan bergabung (opsional)"
-            rows={3}
-          />
-          <div className="flex justify-end space-x-3 mt-4">
-            <button
-              type="submit"
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-              Simpan Perubahan
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEdit(false)}
-              className="bg-gray-200 text-gray-800 font-semibold px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
-              Batal
-            </button>
-          </div>
-        </form>
+        <ParticipantEditForm
+          editForm={editForm}
+          onChange={handleEditChange}
+          onCancel={() => setIsEdit(false)}
+          onSubmit={handleEditSubmit}
+        />
       )}
     </div>
   );
