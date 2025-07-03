@@ -93,6 +93,8 @@ export default function RegisterPage() {
         show={showConfirm}
         onCancel={() => setShowConfirm(false)}
         onConfirm={handleConfirmSubmit}
+        title="Konfirmasi Pendaftaran"
+        message="Apakah Anda yakin ingin mendaftar dengan data yang sudah diisi?"
       />
 
       <div className="w-full max-w-2xl bg-white/80 backdrop-blur-lg p-10 rounded-3xl shadow-xl border border-indigo-100 transition-all duration-300">

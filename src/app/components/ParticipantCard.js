@@ -7,12 +7,14 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ParticipantBadges from "./ParticipantBadges";
 import ParticipantReason from "./ParticipantReason";
 import ParticipantEditForm from "./ParticipantEditForm";
+import ConfirmModal from "./ConfirmModal"; // gunakan modal konfirmasi yang sama
 
 export default function ParticipantCard({ participant }) {
   const { removeParticipant, editParticipant } = useContext(EventContext);
   const [isEdit, setIsEdit] = useState(false);
   const [editForm, setEditForm] = useState({ ...participant });
-  const [showConfirm, setShowConfirm] = useState(false); // State untuk modal konfirmasi
+  const [showConfirm, setShowConfirm] = useState(false); // untuk hapus
+  const [showEditConfirm, setShowEditConfirm] = useState(false); // untuk edit
 
   // Handle perubahan pada input form edit
   const handleEditChange = (e) => {
@@ -20,12 +22,17 @@ export default function ParticipantCard({ participant }) {
     setEditForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle submit form edit
+  // Saat klik Simpan Perubahan, tampilkan modal konfirmasi
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    // Menggunakan participant.id untuk mengidentifikasi peserta yang diedit
+    setShowEditConfirm(true);
+  };
+
+  // Jika user klik "Iya" pada modal konfirmasi edit
+  const handleEditConfirm = () => {
     editParticipant(participant.id, editForm);
     setIsEdit(false);
+    setShowEditConfirm(false);
   };
 
   return (
@@ -88,6 +95,15 @@ export default function ParticipantCard({ participant }) {
         onCancel={() => setShowConfirm(false)}
       />
 
+      {/* Modal Konfirmasi Edit */}
+      <ConfirmModal
+        show={showEditConfirm}
+        onCancel={() => setShowEditConfirm(false)}
+        onConfirm={handleEditConfirm}
+        title="Konfirmasi Perubahan Data"
+        message="Apakah Anda yakin ingin menyimpan perubahan data peserta ini?"
+      />
+
       {/* Tampilan normal informasi peserta atau form edit */}
       {!isEdit ? (
         <>
@@ -115,7 +131,7 @@ export default function ParticipantCard({ participant }) {
           editForm={editForm}
           onChange={handleEditChange}
           onCancel={() => setIsEdit(false)}
-          onSubmit={handleEditSubmit}
+          onSubmit={handleEditSubmit} 
         />
       )}
     </div>

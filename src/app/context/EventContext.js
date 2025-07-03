@@ -1,5 +1,5 @@
 // src/app/context/EventContext.js
-"use client"; // Penting untuk Context API di Next.js App Router
+"use client"; 
 
 import { createContext, useState, useEffect } from "react";
 
@@ -17,8 +17,6 @@ export const EventProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Gagal memuat peserta dari localStorage:", error);
-      // Opsional: bersihkan localStorage jika datanya rusak
-      // localStorage.removeItem("participants");
     }
   }, []);
 
@@ -33,8 +31,6 @@ export const EventProvider = ({ children }) => {
 
   // Fungsi untuk menambahkan peserta baru dengan ID unik
   const addParticipant = (newParticipant) => {
-    // Memberikan ID unik menggunakan Date.now() untuk kesederhanaan.
-    // Untuk aplikasi yang lebih besar, pertimbangkan pustaka seperti 'uuid'.
     setParticipants((prev) => [...prev, { ...newParticipant, id: Date.now() }]);
   };
 

@@ -1,4 +1,10 @@
-export default function ConfirmModal({ show, onCancel, onConfirm }) {
+export default function ConfirmModal({
+  show,
+  onCancel,
+  onConfirm,
+  title,
+  message,
+}) {
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
@@ -19,10 +25,10 @@ export default function ConfirmModal({ show, onCancel, onConfirm }) {
             </svg>
           </div>
           <h4 className="text-lg font-bold text-gray-800 mb-1">
-            Konfirmasi Pendaftaran
+            {title || "Konfirmasi"}
           </h4>
           <p className="text-gray-500 text-sm">
-            Apakah Anda yakin ingin mendaftar dengan data yang sudah diisi?
+            {message || "Apakah Anda yakin ingin melanjutkan aksi ini?"}
           </p>
         </div>
         <div className="flex justify-center gap-4 mt-6">
