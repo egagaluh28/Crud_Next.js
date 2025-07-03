@@ -3,10 +3,10 @@
 
 import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import EventContext from "../context/EventContext";
-import Toast from "../components/Toast";
-import InputField from "../components/InputField";
-import ConfirmModal from "../components/ConfirmModal";
+import EventContext from "../../context/EventContext";
+import Toast from "../../components/Toast";
+import InputField from "../../components/InputField";
+import ConfirmModal from "../../components/ConfirmModal";
 
 export default function RegisterPage() {
   const { addParticipant } = useContext(EventContext);

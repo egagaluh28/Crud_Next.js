@@ -1,8 +1,8 @@
 // src/app/page.js
 "use client";
 import { useContext } from "react";
-import EventContext from "./context/EventContext";
-import ParticipantCard from "./components/ParticipantCard";
+import EventContext from "../context/EventContext";
+import ParticipantCard from "../components/ParticipantCard";
 
 export default function Home() {
   const { participants } = useContext(EventContext);

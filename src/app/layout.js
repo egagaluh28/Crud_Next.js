@@ -1,7 +1,7 @@
 // src/app/layout.js
 import "./globals.css";
 import Link from "next/link";
-import { EventProvider } from "./context/EventContext";
+import { EventProvider } from "../context/EventContext";
 
 export const metadata = {
   title: "Pendaftaran Workshop Eksklusif",
